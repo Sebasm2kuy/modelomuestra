@@ -54,6 +54,30 @@ export default function Envelope({ onOpen }: EnvelopeProps) {
             }}
           />
         </picture>
+
+        {/* Sello de cera sobre la imagen */}
+        <div
+          className="absolute z-20"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            opacity: 0,
+            animation: 'fadeIn 0.8s ease 1.8s both',
+          }}
+        >
+          <img
+            src="/modelomuestra/sello-sm.png"
+            alt="Sello"
+            draggable={false}
+            className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28"
+            style={{
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 4px 16px rgba(139, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+              animation: 'selloStamp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.8s both',
+            }}
+          />
+        </div>
       </div>
 
       <p
