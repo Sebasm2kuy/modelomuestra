@@ -23,29 +23,29 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sebasm2kuy.github.io/modelomuestra/"),
-  title: "Mis XV - Milagros Cabrera",
-  description: "Invitación digital para los XV años de Milagros Cabrera. Sábado 22 de Agosto de 2026, Salón My Father, Montevideo.",
-  keywords: ["XV años", "Milagros", "quinceañera", "Milu", "invitación", "Montevideo", "Uruguay"],
+  title: "Mis XV - Valentina Morales",
+  description: "Invitación digital para los XV años de Valentina Morales. Sábado 14 de Marzo de 2027, Salón La Terraza, Punta del Este.",
+  keywords: ["XV años", "Valentina", "quinceañera", "Vale", "invitación", "Punta del Este", "Uruguay"],
   openGraph: {
-    title: "Mis XV - Milagros Cabrera",
-    description: "Invitación digital para los XV años de Milagros Cabrera. Sábado 22 de Agosto de 2026, Salón My Father, Montevideo.",
+    title: "Mis XV - Valentina Morales",
+    description: "Invitación digital para los XV años de Valentina Morales. Sábado 14 de Marzo de 2027, Salón La Terraza, Punta del Este.",
     type: "website",
     locale: "es_UY",
     url: "https://sebasm2kuy.github.io/modelomuestra/",
-    siteName: "XV Años de Milagros",
+    siteName: "XV Años de Valentina",
     images: [
       {
         url: "/modelomuestra/invitacion-vertical.webp",
         width: 1080,
         height: 1350,
-        alt: "Invitación XV Años de Milagros Cabrera",
+        alt: "Invitación XV Años de Valentina Morales",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mis XV - Milagros Cabrera",
-    description: "Invitación digital para los XV años de Milagros Cabrera",
+    title: "Mis XV - Valentina Morales",
+    description: "Invitación digital para los XV años de Valentina Morales",
     images: ["/modelomuestra/invitacion-vertical.webp"],
   },
 };

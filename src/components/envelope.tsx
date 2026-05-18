@@ -42,7 +42,7 @@ export default function Envelope({ onOpen }: EnvelopeProps) {
           <source srcSet={cfg.invitacion.imagen} type="image/webp" />
           <img
             src={cfg.invitacion.imagenFallback}
-            alt="Invitación XV Años - Milagros"
+            alt="Invitación XV Años - Valentina"
             draggable={false}
             className="object-contain rounded-lg relative z-10"
             style={{

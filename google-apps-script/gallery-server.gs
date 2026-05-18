@@ -1,7 +1,7 @@
 /**
  * ============================================
  * Google Apps Script — Galería de Fotos
- * Milagros XV Años - Miluaistudio
+ * Valentina XV Años - Modelo Muestra
  * ============================================
  *
  * INSTRUCCIONES DE CONFIGURACIÓN:
@@ -21,14 +21,14 @@
  * 13. Hacer build y deploy
  *
  * El script crea automáticamente:
- * - Una carpeta "MilagrosXV_Galeria" en tu Google Drive
- * - Una hoja de cálculo "MilagrosXV_Galeria_DB" con los registros
+ * - Una carpeta "ValentinaXV_Galeria" en tu Google Drive
+ * - Una hoja de cálculo "ValentinaXV_Galeria_DB" con los registros
  *
  * ============================================
  */
 
-var FOLDER_NAME = 'MilagrosXV_Galeria';
-var SPREADSHEET_NAME = 'MilagrosXV_Galeria_DB';
+var FOLDER_NAME = 'ValentinaXV_Galeria';
+var SPREADSHEET_NAME = 'ValentinaXV_Galeria_DB';
 var SHEET_NAME = 'Fotos';
 var MAX_FILE_SIZE_KB = 500;
 

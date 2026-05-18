@@ -113,45 +113,51 @@ export interface SiteConfig {
 const config: SiteConfig = {
   "evento": {
     "tipo": "Mis XV Años",
-    "nombre": "Milagros",
-    "apellido": "Cabrera",
-    "apodo": "Milu",
-    "fecha": "Sábado 22 de Agosto",
-    "anio": "2026",
-    "fechaEvento": "2026-08-22 21:00",
-    "lugar": "Salón My Father",
-    "ubicacion": "Montevideo",
-    "direccion": "Granaderos 3875, Montevideo",
-    "mapsUrl": "https://maps.app.goo.gl/uXq5HCuF54u8DqJj8",
-    "hashtag": "#MilagrosXV2026",
-    "hashtagUrl": "https://www.instagram.com/explore/tags/MilagrosXV2026/"
+    "nombre": "Valentina",
+    "apellido": "Morales",
+    "apodo": "Vale",
+    "fecha": "Sábado 14 de Marzo",
+    "anio": "2027",
+    "fechaEvento": "2027-03-14 21:30",
+    "lugar": "Salón La Terraza",
+    "ubicacion": "Punta del Este",
+    "direccion": "Av. Gorlero 1025, Punta del Este",
+    "mapsUrl": "https://maps.app.goo.gl/abc123XYZ",
+    "hashtag": "#ValentinaXV2027",
+    "hashtagUrl": "https://www.instagram.com/explore/tags/ValentinaXV2027/"
   },
   "dedicatoria": {
-    "cita": "Hay momentos que no se repiten, personas que no se olvidan y recuerdos que se guardan para siempre en el corazón.",
-    "cuerpo": "Cada persona que está leyendo esto es parte importante de mi historia. Los esperamos con toda la emoción del mundo para compartir juntos esta noche tan especial.",
-    "firma": "Milagros"
+    "cita": "La vida no se mide por los respiramos que tomamos, sino por los momentos que nos dejan sin aliento.",
+    "cuerpo": "Quiero que cada uno de ustedes sea parte de esta celebración tan importante para mí. Los espero con los brazos abiertos para vivir juntos una noche mágica llena de música, risas y recuerdos inolvidables.",
+    "firma": "Valentina"
   },
   "timeline": {
     "titulo": "La Noche",
     "subtitulo": "Cada momento cuenta",
     "eventos": [
       {
-        "hora": "21:00",
-        "titulo": "Recepción",
-        "desc": "Ingreso de invitados",
+        "hora": "21:30",
+        "titulo": "Bienvenida",
+        "desc": "Llegada y recepción de invitados",
         "icono": "🥂"
       },
       {
-        "hora": "22:00",
+        "hora": "22:30",
         "titulo": "Mi Ingreso",
-        "desc": "La noche comienza",
+        "desc": "El momento más esperado",
         "icono": "👑"
       },
       {
-        "hora": "02:00",
-        "titulo": "Espejo Mágico",
-        "desc": "Las mejores fotos",
-        "icono": "📸"
+        "hora": "00:00",
+        "titulo": "Brindis",
+        "desc": "Brindemos juntos",
+        "icono": "🍾"
+      },
+      {
+        "hora": "01:30",
+        "titulo": "DJ & Fiesta",
+        "desc": "La noche no para",
+        "icono": "🎵"
       }
     ]
   },
@@ -181,35 +187,35 @@ const config: SiteConfig = {
   "musica": {
     "titulo": "Nuestra Playlist",
     "subtitulo": "Escuchá nuestra selección y ayudanos con la música de la noche",
-    "playlistUrl": "https://open.spotify.com/playlist/4RAVjizGdBtJx18kkwttqn?si=cefb9bcb1cdf470c&pt=c7fa8ec582e71775cd0ebda794d251d0",
-    "embedUrl": "https://open.spotify.com/embed/playlist/4RAVjizGdBtJx18kkwttqn?utm_source=generator&theme=0&si=cefb9bcb1cdf470c&pt=c7fa8ec582e71775cd0ebda794d251d0",
+    "playlistUrl": "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+    "embedUrl": "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0",
     "botonAgregar": "Agregar canciones",
     "botonSpotify": "Abre en Spotify y suma tus temas favoritos"
   },
   "rsvp": {
     "titulo": "Confirmar",
     "subtitulo": "Espero poder contar contigo para hacer de esta noche algo inolvidable.",
-    "fechaLimite": "10/08",
-    "fechaLimiteFull": "10/08/2026",
-    "googleSheetUrl": "https://script.google.com/macros/s/AKfycbxOPx5jE1vcgW4nUfXWDkbKqQU8Ejex9RLI4rv64yZweZLFEiKrCoDj_8b7fryti3Sn/exec",
-    "hostPhone": "59895239386",
+    "fechaLimite": "01/03",
+    "fechaLimiteFull": "01/03/2027",
+    "googleSheetUrl": "https://script.google.com/macros/s/EXAMPLE_DEMO_URL/exec",
+    "hostPhone": "59899123456",
     "regalos": {
       "titulo": "Regalos",
       "subtitulo": "Si deseas tener un detalle conmigo, te dejo las opciones donde podés hacerlo.",
       "abitab": {
         "titulo": "Cuenta Abitab",
-        "numero": "145920"
+        "numero": "398201"
       },
       "miDinero": {
         "titulo": "Cuenta Mi Dinero",
-        "numero": "2401461"
+        "numero": "8715293"
       }
     }
   },
   "footer": {
-    "apodo": "Milu",
-    "ubicacion": "Montevideo • Uruguay • 2026",
-    "frase": "Con amor, para un día inolvidable"
+    "apodo": "Vale",
+    "ubicacion": "Punta del Este • Uruguay • 2027",
+    "frase": "Una noche soñada, hecha realidad"
   },
   "invitacion": {
     "imagen": "/modelomuestra/invitacion-vertical.webp",
@@ -225,9 +231,9 @@ const config: SiteConfig = {
       "S": "Seg"
     },
     "botonCalendario": "Agregar al calendario",
-    "calendarioTitulo": "XV Años de Milagros",
-    "calendarioLocation": "Salón My Father, Granaderos 3875, Montevideo",
-    "calendarioDetalles": "XV Años de Milagros Cabrera\nSalón My Father - Granaderos 3875, Montevideo\n21:00 hs\n\n¡Nos vemos!"
+    "calendarioTitulo": "XV Años de Valentina",
+    "calendarioLocation": "Salón La Terraza, Av. Gorlero 1025, Punta del Este",
+    "calendarioDetalles": "XV Años de Valentina Morales\nSalón La Terraza - Av. Gorlero 1025, Punta del Este\n21:30 hs\n\n¡Nos vemos!"
   },
   "fondo": {
     "fotos": [

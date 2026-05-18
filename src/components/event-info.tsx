@@ -62,7 +62,7 @@ export default function EventInfo() {
           {/* Map — static grayscale, NO transition (animated filter on iframe kills scroll perf) */}
           <div className={`css-fade-up h-[280px] sm:h-[350px] md:h-[500px] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[3rem] overflow-hidden border shadow-2xl relative group cursor-pointer grayscale`} style={{ borderColor: 'rgba(184, 134, 11, 0.1)' }} onClick={() => window.open(cfg.evento.mapsUrl, '_blank')}>
             <iframe
-              src="https://maps.google.com/maps?q=Salon+My+Father+Granaderos+3875+Montevideo+Uruguay&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=Salon+La+Terraza+Gorlero+1025+Punta+del+Este+Uruguay&t=&z=16&ie=UTF8&iwloc=&output=embed"
               width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
