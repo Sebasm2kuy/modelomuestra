@@ -59,9 +59,9 @@ export default function Envelope({ onOpen }: EnvelopeProps) {
         <div
           className="absolute z-20"
           style={{
-            top: '50%',
+            bottom: '8%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
+            transform: 'translate(-50%, 0)',
             opacity: 0,
             animation: 'fadeIn 0.8s ease 1.8s both',
           }}
