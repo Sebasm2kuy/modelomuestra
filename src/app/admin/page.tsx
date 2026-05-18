@@ -517,7 +517,7 @@ export default function AdminPage() {
     }
     setTokenStatus('checking')
     try {
-      const res = await fetch('https://api.github.com/repos/Sebasm2kuy/Miluaistudio/contents/src/data/config.ts', {
+      const res = await fetch('https://api.github.com/repos/Sebasm2kuy/modelomuestra/contents/src/data/config.ts', {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
       })
       if (res.ok) {
@@ -740,7 +740,7 @@ export default function AdminPage() {
                   </div>
                 )}
                 <p className="text-[10px] text-gray-600">
-                  Si no tenés token: GitHub &gt; Settings &gt; Developer settings &gt; Personal access tokens &gt; Fine-grained tokens. Dale permiso de &quot;Contents&quot; read/write al repo Miluaistudio.
+                  Si no tenés token: GitHub &gt; Settings &gt; Developer settings &gt; Personal access tokens &gt; Fine-grained tokens. Dale permiso de &quot;Contents&quot; read/write al repo modelomuestra.
                 </p>
               </div>
             </div>

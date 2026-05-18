@@ -1,8 +1,8 @@
 // Deploy via GitHub API — works on static sites (GitHub Pages, etc.)
 
-const GITHUB_REPO = 'Sebasm2kuy/Miluaistudio'
+const GITHUB_REPO = 'Sebasm2kuy/modelomuestra'
 const CONFIG_PATH = 'src/data/config.ts'
-const BASE_PATH = '/Miluaistudio'
+const BASE_PATH = '/modelomuestra'
 
 // Type definitions are embedded here so we can build the full config.ts file
 const CONFIG_TYPES = `// ============================================================
@@ -185,7 +185,7 @@ export async function deployToGitHub(
 
 /**
  * Upload a file (image) to the repo via GitHub Contents API.
- * The file is stored under `public/uploads/` and served at `/Miluaistudio/uploads/filename`.
+ * The file is stored under `public/uploads/` and served at `/modelomuestra/uploads/filename`.
  */
 export async function uploadToGitHub(
   file: File,

@@ -161,20 +161,20 @@ const config: SiteConfig = {
     "botonSubir": "Dejale un recuerdo",
     "fotos": [
       {
-        "webp": "/Miluaistudio/gallery/gallery1.webp",
-        "fallback": "/Miluaistudio/gallery/gallery1.jpg"
+        "webp": "/modelomuestra/gallery/gallery1.webp",
+        "fallback": "/modelomuestra/gallery/gallery1.jpg"
       },
       {
-        "webp": "/Miluaistudio/gallery/gallery2.webp",
-        "fallback": "/Miluaistudio/gallery/gallery2.jpg"
+        "webp": "/modelomuestra/gallery/gallery2.webp",
+        "fallback": "/modelomuestra/gallery/gallery2.jpg"
       },
       {
-        "webp": "/Miluaistudio/gallery/gallery3.webp",
-        "fallback": "/Miluaistudio/gallery/gallery3.jpg"
+        "webp": "/modelomuestra/gallery/gallery3.webp",
+        "fallback": "/modelomuestra/gallery/gallery3.jpg"
       },
       {
-        "webp": "/Miluaistudio/gallery/gallery4.webp",
-        "fallback": "/Miluaistudio/gallery/gallery4.jpg"
+        "webp": "/modelomuestra/gallery/gallery4.webp",
+        "fallback": "/modelomuestra/gallery/gallery4.jpg"
       }
     ]
   },
@@ -212,8 +212,8 @@ const config: SiteConfig = {
     "frase": "Con amor, para un día inolvidable"
   },
   "invitacion": {
-    "imagen": "/Miluaistudio/invitacion-vertical.webp",
-    "imagenFallback": "/Miluaistudio/invitacion-vertical.png",
+    "imagen": "/modelomuestra/invitacion-vertical.webp",
+    "imagenFallback": "/modelomuestra/invitacion-vertical.png",
     "textoAbrir": "Toca para abrir"
   },
   "countdown": {
@@ -231,10 +231,10 @@ const config: SiteConfig = {
   },
   "fondo": {
     "fotos": [
-      "/Miluaistudio/gallery/gallery1.webp",
-      "/Miluaistudio/gallery/gallery2.webp",
-      "/Miluaistudio/gallery/gallery3.webp",
-      "/Miluaistudio/gallery/gallery4.webp"
+      "/modelomuestra/gallery/gallery1.webp",
+      "/modelomuestra/gallery/gallery2.webp",
+      "/modelomuestra/gallery/gallery3.webp",
+      "/modelomuestra/gallery/gallery4.webp"
     ]
   },
   "colores": {

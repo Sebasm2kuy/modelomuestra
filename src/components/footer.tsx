@@ -14,7 +14,7 @@ export default function Footer() {
 
     if (clickCount.current >= 5) {
       clickCount.current = 0
-      window.location.href = '/Miluaistudio/admin'
+      window.location.href = '/modelomuestra/admin'
     }
   }, [])
 

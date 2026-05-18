@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/Miluaistudio",
+  basePath: "/modelomuestra",
   trailingSlash: true,
   images: {
     unoptimized: true,
