@@ -1,0 +1,384 @@
+'use client'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { X, ChevronLeft, ChevronRight, Maximize2, Camera, Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { useConfig } from '@/hooks/useConfig'
+
+const PHOTO_UPLOAD_URL = 'https://script.google.com/macros/s/AKfycbxUezuoHmM_xfpTendM2tHePMOkgaJ2VHpNW-733d0izMfOgY9dpkysMmWW9pV7f0jxiw/exec'
+
+
+interface Photo {
+  id: string
+  src: string
+  type: 'original' | 'uploaded'
+}
+
+type UploadState = 'idle' | 'compressing' | 'uploading' | 'ok' | 'error'
+
+const CHUNK_SIZE = 4000
+
+function compressImage(file: File, maxSize = 640, quality = 0.4): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      let { width, height } = img
+      if (width > maxSize || height > maxSize) {
+        if (width > height) { height = Math.round((height * maxSize) / width); width = maxSize }
+        else { width = Math.round((width * maxSize) / height); height = maxSize }
+      }
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return reject(new Error('No canvas context'))
+      ctx.drawImage(img, 0, 0, width, height)
+      resolve(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.onerror = reject
+    img.src = URL.createObjectURL(file)
+  })
+}
+
+export default function Gallery() {
+  const cfg = useConfig()
+  const originalPhotos = cfg.galeria.fotos.map(p => ({ src: p.webp, fallback: p.fallback }))
+  const [photos, setPhotos] = useState<Photo[]>(
+    originalPhotos.map((p, i) => ({ id: `orig-${i}`, src: p.src, type: 'original' as const }))
+  )
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [uploadModal, setUploadModal] = useState(false)
+  const [uploadState, setUploadState] = useState<UploadState>('idle')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const parseGasResponse = async (res: Response): Promise<any> => {
+    const text = await res.text()
+    try { return JSON.parse(text) } catch {
+      const match = text.match(/\{[\s\S]*\}/)
+      if (match) { try { return JSON.parse(match[0]) } catch { /* ignore */ } }
+      return null
+    }
+  }
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch(`${PHOTO_UPLOAD_URL}?action=getPhotos`)
+        if (res.ok) {
+          const data = await parseGasResponse(res)
+          if (data && Array.isArray(data.photos)) {
+            const uploaded: Photo[] = data.photos.map((url: string, i: number) => ({
+              id: `srv-${i}`, src: url, type: 'uploaded' as const,
+            }))
+            setPhotos(prev => [...prev, ...uploaded])
+          }
+        }
+      } catch { /* silently ignore */ }
+    }
+    fetchPhotos()
+  }, [])
+
+  const openLightbox = (idx: number) => setLightboxIdx(idx)
+  const closeLightbox = () => setLightboxIdx(null)
+  const prev = () => setLightboxIdx(p => (p !== null ? (p - 1 + photos.length) % photos.length : null))
+  const next = () => setLightboxIdx(p => (p !== null ? (p + 1) % photos.length : null))
+
+  const handleTouchStart = (e: React.TouchEvent) => { setTouchStart(e.touches[0].clientX) }
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return
+    const diff = touchStart - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev() }
+    setTouchStart(null)
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) { setSelectedFile(file); setPreview(URL.createObjectURL(file)); setUploadState('idle') }
+  }
+
+  const scrollCarousel = useCallback((direction: 'left' | 'right') => {
+    if (!scrollRef.current) return
+    const card = scrollRef.current.querySelector('[data-carousel-card]') as HTMLElement
+    if (!card) return
+    const scrollAmount = card.offsetWidth + 16
+    scrollRef.current.scrollBy({
+      left: direction === 'right' ? scrollAmount : -scrollAmount,
+      behavior: 'smooth'
+    })
+  }, [])
+
+  const handleUpload = useCallback(async () => {
+    if (!selectedFile) return
+    try {
+      setUploadState('compressing')
+      const compressed = await compressImage(selectedFile)
+      setUploadState('uploading')
+
+      // 1. Convertir a base64url (URL-safe)
+      const rawBase64 = compressed.replace(/^data:image\/[a-zA-Z]+;base64,/, '')
+      const base64url = rawBase64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+
+      // 2. Generar ID unico y dividir en chunks
+      const uploadId = Date.now().toString(36) + Math.random().toString(36).substr(2)
+      const totalChunks = Math.ceil(base64url.length / CHUNK_SIZE)
+
+      // 3. Enviar cada chunk como GET
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = base64url.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+        await fetch(
+          `${PHOTO_UPLOAD_URL}?action=chunk&uid=${uploadId}&i=${i}&t=${totalChunks}&d=${chunk}`,
+          { redirect: 'follow' }
+        )
+      }
+
+      // 4. Ensamblar en el servidor
+      const res = await fetch(`${PHOTO_UPLOAD_URL}?action=assemble&uid=${uploadId}`, { redirect: 'follow' })
+      const data = await parseGasResponse(res)
+
+      if (data && data.success && data.url) {
+        setPhotos(prev => [...prev, { id: `upload-${Date.now()}`, src: data.url, type: 'uploaded' }])
+        setUploadState('ok')
+        setTimeout(() => {
+          setUploadModal(false)
+          setSelectedFile(null)
+          setPreview(null)
+          setUploadState('idle')
+        }, 1500)
+      } else {
+        setUploadState('error')
+      }
+    } catch { setUploadState('error') }
+  }, [selectedFile])
+
+  const closeUpload = () => {
+    if (uploadState === 'compressing' || uploadState === 'uploading') return
+    setUploadModal(false); setSelectedFile(null); setPreview(null); setUploadState('idle')
+  }
+
+  // Status config con componente de icono extraído (evita React error #418)
+  const statusText = uploadState === 'compressing' ? 'Comprimiendo...' : uploadState === 'uploading' ? 'Subiendo...' : uploadState === 'ok' ? '¡Foto subida!' : uploadState === 'error' ? 'Error, intentá de nuevo' : ''
+  const statusColor = uploadState === 'error' ? 'text-red-500' : uploadState === 'ok' ? 'text-green-600' : 'text-gold'
+  const statusSpinning = uploadState === 'compressing' || uploadState === 'uploading'
+  const showStatus = uploadState !== 'idle'
+
+  return (
+    <section id="galeria" className="max-w-5xl mx-auto px-3 sm:px-4 relative z-10">
+      <div className={`css-fade-up glass-card rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[4rem] p-5 sm:p-8 md:p-24 text-center relative overflow-hidden`}>
+        <h2 className="font-serif italic text-3xl sm:text-3xl md:text-5xl text-bordeaux mb-2 sm:mb-3">{cfg.galeria.titulo}</h2>
+        <p className="text-gray-400 italic mb-6 sm:mb-10 md:mb-16 text-sm sm:text-sm md:text-base px-2">
+          {cfg.galeria.subtitulo}
+        </p>
+
+        {/* ===== Horizontal Carousel ===== */}
+        <div className="relative">
+          {/* Desktop arrows — delicate gold circles */}
+          <button
+            onClick={() => scrollCarousel('left')}
+            className="hidden md:flex absolute -left-2 xl:-left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 xl:w-10 xl:h-10 rounded-full items-center justify-center border shadow-lg transition-[color,border-color,background-color] duration-300"
+            style={{
+              background: 'rgba(253, 252, 251, 0.92)',
+              borderColor: 'rgba(184, 134, 11, 0.25)',
+              color: 'rgba(184, 134, 11, 0.7)',
+            }}
+            aria-label="Foto anterior"
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 134, 11, 0.5)'; e.currentTarget.style.color = '#b8860b' }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 134, 11, 0.25)'; e.currentTarget.style.color = 'rgba(184, 134, 11, 0.7)' }}
+          >
+            <ChevronLeft size={18} strokeWidth={1.5} />
+          </button>
+          <button
+            onClick={() => scrollCarousel('right')}
+            className="hidden md:flex absolute -right-2 xl:-right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 xl:w-10 xl:h-10 rounded-full items-center justify-center border shadow-lg transition-[color,border-color,background-color] duration-300"
+            style={{
+              background: 'rgba(253, 252, 251, 0.92)',
+              borderColor: 'rgba(184, 134, 11, 0.25)',
+              color: 'rgba(184, 134, 11, 0.7)',
+            }}
+            aria-label="Foto siguiente"
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 134, 11, 0.5)'; e.currentTarget.style.color = '#b8860b' }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 134, 11, 0.25)'; e.currentTarget.style.color = 'rgba(184, 134, 11, 0.7)' }}
+          >
+            <ChevronRight size={18} strokeWidth={1.5} />
+          </button>
+
+          {/* Scrollable track */}
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory gap-3 sm:gap-4 md:gap-5 pb-1"
+          >
+            {photos.map((photo, idx) => {
+              const isOriginal = photo.type === 'original'
+              const origIdx = isOriginal ? parseInt(photo.id.split('-')[1]) : -1
+              return (
+                <div
+                  key={photo.id}
+                  data-carousel-card
+                  className="flex-shrink-0 w-[42vw] sm:w-[36vw] md:w-[30%] aspect-[3/4] snap-center rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative"
+                  style={{ background: '#f5f0eb' }}
+                  onClick={() => openLightbox(idx)}
+                >
+                  {isOriginal ? (
+                    <picture>
+                      <source srcSet={photo.src} type="image/webp" />
+                      <img
+                        src={originalPhotos[origIdx].fallback}
+                        alt={`Momento especial ${origIdx + 1}`}
+                        className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+                        draggable={false}
+                      />
+                    </picture>
+                  ) : (
+                    <img
+                      src={photo.src}
+                      alt="Foto compartida"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      draggable={false}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bordeaux/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-2 group-hover:translate-y-0">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 flex items-center justify-center border border-white/30">
+                      <Maximize2 size={14} className="sm:w-4 sm:h-4 text-white" strokeWidth={1.5} />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+
+          </div>
+        </div>
+
+        {/* Upload button — outside the carousel */}
+        <button
+          onClick={() => setUploadModal(true)}
+          className="mt-6 sm:mt-8 md:mt-10 mx-auto flex items-center justify-center gap-3 sm:gap-4 py-4 sm:py-5 px-10 sm:px-16 rounded-full border transition-[color,border-color,background-color,transform] duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            borderColor: 'rgba(184, 134, 11, 0.35)',
+            color: '#b8860b',
+            background: 'rgba(184, 134, 11, 0.06)',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 134, 11, 0.6)'; e.currentTarget.style.color = '#8a6b0d'; e.currentTarget.style.background = 'rgba(184, 134, 11, 0.1)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 134, 11, 0.35)'; e.currentTarget.style.color = '#b8860b'; e.currentTarget.style.background = 'rgba(184, 134, 11, 0.06)' }}
+        >
+          <Camera size={20} className="sm:w-5 sm:h-5" strokeWidth={1.5} />
+          <span className="font-cursive text-xl sm:text-2xl md:text-3xl italic" style={{ color: 'inherit' }}>
+            {cfg.galeria.botonSubir}
+          </span>
+        </button>
+      </div>
+
+      {/* ===== Upload Modal ===== */}
+      <div
+        className={`fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6 modal-overlay ${uploadModal ? 'open' : ''}`}
+        style={{ background: 'rgba(0, 0, 0, 0.9)' }}
+        onClick={closeUpload}
+      >
+        <div
+          className="modal-content w-full max-w-md rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 relative overflow-hidden"
+          style={{
+            background: 'rgba(255, 255, 255, 0.98)',
+            border: '1px solid rgba(184, 134, 11, 0.15)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.3)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={closeUpload}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-[color,background-color]"
+            disabled={uploadState === 'compressing' || uploadState === 'uploading'}
+          >
+            <X size={16} />
+          </button>
+
+          <h3 className="font-serif italic text-xl sm:text-2xl text-bordeaux mb-1">Compartí tu foto</h3>
+          <p className="text-gray-400 text-xs sm:text-sm mb-6">Las mejores fotos de la noche</p>
+
+          {!preview ? (
+            <div
+              className="border-2 border-dashed rounded-2xl p-8 sm:p-12 flex flex-col items-center gap-3 cursor-pointer transition-[border-color,background-color] duration-300 hover:border-gold/40 hover:bg-gold/[0.02]"
+              style={{ borderColor: 'rgba(184, 134, 11, 0.25)' }}
+              onClick={() => fileRef.current?.click()}
+            >
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-gold" style={{ background: 'rgba(184, 134, 11, 0.08)' }}>
+                <Upload size={22} strokeWidth={1.5} />
+              </div>
+              <p className="text-gray-500 text-xs sm:text-sm font-medium">Tocá para elegir una foto</p>
+              <p className="text-gray-300 text-[10px] sm:text-xs">JPG o PNG</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-100">
+                <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  disabled={uploadState === 'compressing' || uploadState === 'uploading'}
+                  className="flex-1 py-3 rounded-xl border text-gray-500 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-40"
+                  style={{ borderColor: 'rgba(0,0,0,0.1)' }}
+                >Cambiar</button>
+                <button
+                  onClick={handleUpload}
+                  disabled={uploadState === 'compressing' || uploadState === 'uploading' || uploadState === 'ok'}
+                  className="gold-button flex-1 py-3 rounded-xl text-white text-xs font-semibold disabled:opacity-60"
+                >{uploadState === 'ok' ? '¡Subida!' : 'Subir foto'}</button>
+              </div>
+              {showStatus && (
+                <div className={`flex items-center justify-center gap-2 text-xs ${statusColor}`}>
+                  {uploadState === 'ok' ? (
+                    <CheckCircle size={14} />
+                  ) : uploadState === 'error' ? (
+                    <AlertCircle size={14} />
+                  ) : (
+                    <Loader2 size={14} className={statusSpinning ? 'animate-spin' : ''} />
+                  )}
+                  <span>{statusText}</span>
+                </div>
+              )}
+            </div>
+          )}
+          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileSelect} />
+        </div>
+      </div>
+
+      {/* ===== Lightbox ===== */}
+      <div
+        className={`fixed inset-0 z-[300] flex items-center justify-center p-2 sm:p-4 md:p-10 modal-overlay ${lightboxIdx !== null ? 'open' : ''}`}
+        style={{ background: 'rgba(0, 0, 0, 0.96)' }}
+        onClick={closeLightbox}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <button onClick={closeLightbox} className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-8 md:right-8 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-[color,background-color] z-10">
+          <X size={18} className="sm:w-5 sm:h-5" />
+        </button>
+        <button onClick={(e) => { e.stopPropagation(); prev() }} className="absolute left-1 sm:left-2 md:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-[color,background-color] z-10">
+          <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+        </button>
+        <button onClick={(e) => { e.stopPropagation(); next() }} className="absolute right-1 sm:right-2 md:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-[color,background-color] z-10">
+          <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+        </button>
+        {lightboxIdx !== null && (
+          <img
+            src={photos[lightboxIdx].src}
+            alt={`Foto ${lightboxIdx + 1}`}
+            className="modal-content max-w-full max-h-[80vh] sm:max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
+        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <div className="flex gap-1.5">
+            {photos.map((_, i) => (
+              <div key={i} className={`rounded-full transition-[width,height,background-color] duration-300 ${lightboxIdx === i ? 'w-6 h-1 bg-goldLight' : 'w-1 h-1 bg-white/30'}`} />
+            ))}
+          </div>
+          <span className="text-white/30 text-[10px] sm:text-[10px] tracking-[0.3em] uppercase">
+            {lightboxIdx !== null ? `${lightboxIdx + 1} / ${photos.length}` : ''}
+          </span>
+        </div>
+      </div>
+    </section>
+  )
+}
