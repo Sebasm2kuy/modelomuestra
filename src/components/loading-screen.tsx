@@ -7,8 +7,6 @@ interface LoadingScreenProps { onDone: () => void }
 const ASSETS = [
   '/modelomuestra/gallery/gallery1.webp',
   '/modelomuestra/gallery/gallery2.webp',
-  '/modelomuestra/gallery/gallery3.webp',
-  '/modelomuestra/gallery/gallery4.webp',
   '/modelomuestra/invitacion-vertical.webp',
 ]
 

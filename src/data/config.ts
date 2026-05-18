@@ -173,14 +173,6 @@ const config: SiteConfig = {
       {
         "webp": "/modelomuestra/gallery/gallery2.webp",
         "fallback": "/modelomuestra/gallery/gallery2.jpg"
-      },
-      {
-        "webp": "/modelomuestra/gallery/gallery3.webp",
-        "fallback": "/modelomuestra/gallery/gallery3.jpg"
-      },
-      {
-        "webp": "/modelomuestra/gallery/gallery4.webp",
-        "fallback": "/modelomuestra/gallery/gallery4.jpg"
       }
     ]
   },
@@ -238,9 +230,7 @@ const config: SiteConfig = {
   "fondo": {
     "fotos": [
       "/modelomuestra/gallery/gallery1.webp",
-      "/modelomuestra/gallery/gallery2.webp",
-      "/modelomuestra/gallery/gallery3.webp",
-      "/modelomuestra/gallery/gallery4.webp"
+      "/modelomuestra/gallery/gallery2.webp"
     ]
   },
   "colores": {
