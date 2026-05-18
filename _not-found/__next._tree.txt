@@ -1,2 +1,2 @@
-:HL["/modelomuestra/_next/static/chunks/17vl~7_8v4zch.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"N6OzcZP3zSpaq0J8SQCh0"}
+:HL["/modelomuestra/_next/static/chunks/08-644tg6q.bh.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"eAuCqNLHitrlpWjJF_rK4"}
