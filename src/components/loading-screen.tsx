@@ -8,6 +8,7 @@ const ASSETS = [
   '/modelomuestra/gallery/gallery1.webp',
   '/modelomuestra/gallery/gallery2.webp',
   '/modelomuestra/invitacion-vertical.webp',
+  '/modelomuestra/sello-sm.png',
 ]
 
 function preloadImages(urls: string[]): Promise<void> {
@@ -37,7 +38,14 @@ export default function LoadingScreen({ onDone }: LoadingScreenProps) {
   const cfg = useConfig()
   const [progress, setProgress] = useState(0)
   const [fading, setFading] = useState(false)
+  const [selloVisible, setSelloVisible] = useState(false)
   const doneRef = useRef(false)
+
+  // Show sello after a brief delay with a stamp animation
+  useEffect(() => {
+    const timer = setTimeout(() => setSelloVisible(true), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -131,12 +139,40 @@ export default function LoadingScreen({ onDone }: LoadingScreenProps) {
         height: 'calc(100% + 10px)',
       }}
     >
+      {/* Sello de cera con animación de estampado */}
+      <div
+        className="mb-6 sm:mb-8"
+        style={{
+          opacity: selloVisible ? 1 : 0,
+          transform: selloVisible ? 'scale(1) rotate(0deg)' : 'scale(1.6) rotate(-20deg)',
+          transition: 'opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          filter: selloVisible ? 'drop-shadow(0 4px 20px rgba(139, 0, 0, 0.4))' : 'none',
+          transitionDelay: '0s',
+        }}
+      >
+        <img
+          src="/modelomuestra/sello-sm.png"
+          alt="Sello"
+          draggable={false}
+          className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+          style={{
+            objectFit: 'contain',
+          }}
+        />
+      </div>
+
+      {/* Nombre en cursiva dorada */}
       <p
-        className="font-cursive text-7xl sm:text-6xl mb-12 sm:mb-12"
-        style={{ color: '#d4af37' }}
+        className="font-cursive text-5xl sm:text-6xl md:text-7xl mb-10 sm:mb-12"
+        style={{
+          color: '#d4af37',
+          textShadow: '0 0 40px rgba(212, 175, 55, 0.3), 0 0 80px rgba(212, 175, 55, 0.1)',
+        }}
       >
         {cfg.evento.nombre}
       </p>
+
+      {/* Barra de progreso */}
       <div className="w-48 sm:w-64 md:w-72">
         <div
           className="h-[2px] rounded-full overflow-hidden"
